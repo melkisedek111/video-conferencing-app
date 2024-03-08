@@ -57,7 +57,8 @@ function App() {
     const [selectedDevice, setSelectedDevice] = useState<string>("");
     const [peerId, setPeerId] = useState<string | undefined>(undefined);
     const [remoteStreams, setRemoteStreams] = useState<TRemoteStream[]>([]);
-    const [socketIo, setSocketIo] = useState<Socket | null>(null)
+    const [socketIo, setSocketIo] = useState<Socket | null>(null);
+    const [checkSoloDevices, setCheckSoloDevices] = useState<boolean>(false);
 
     useEffect(() => {
         if (!socketIo) {
@@ -78,7 +79,7 @@ function App() {
             if (username) {
                 // initialize local stream
                 let stream: MediaStream | undefined = undefined;
-
+                
                 // check for multiple cameras
                 if (devices.length) {
                     if (selectedDevice) {
@@ -88,6 +89,8 @@ function App() {
                     // select only the existed camera
                     stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 }
+
+                console.log({stream})
 
                 if (stream) {
                     // assign local stream
@@ -128,7 +131,7 @@ function App() {
         }
         getUserMedia();
 
-    }, [selectedDevice]);
+    }, [selectedDevice, checkSoloDevices]);
 
     const handleCameraChange = (value: string) => {
         setSelectedDevice(value);
@@ -139,8 +142,12 @@ function App() {
         navigator.mediaDevices.enumerateDevices().then(dev => {
             const videoDevices = dev.filter(device => device.kind === 'videoinput');
             const newDevices = videoDevices.map(device => ({ label: device.label, value: device.deviceId })).filter(device => device.label !== "");
-            console.log({newDevices})
-            setDevices(newDevices);
+
+            if (newDevices.length > 1) {
+                setDevices(newDevices);
+            } else {
+                setCheckSoloDevices(true);
+            }
         });
 
         if (!peer) {
