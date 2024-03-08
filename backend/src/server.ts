@@ -31,7 +31,7 @@ app.use(function (req, res, next) {
 
 app.use(express.static(__dirname));
 
-const PORT = process.env.PORT || 8181;
+const PORT = 4000;
 
 //we need a key and cert to run https
 //we generated them with mkcert
