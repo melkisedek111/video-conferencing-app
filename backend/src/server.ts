@@ -52,8 +52,9 @@ if (process.env.NODE_ENV !== "development") {
 }
 
 //create our socket.io server... it will listen to our express port
-const frontendUrl =
-	process.env.PRODUCTION_FRONTEND_URL || "https://localhost:5173";
+const frontendUrl = process.env.PRODUCTION_FRONTEND_URL || "https://localhost:5173";
+
+console.log({ frontendUrl }, process.env.NODE_ENV);
 
 const io = new Server(expressServer, {
 	cors: {
