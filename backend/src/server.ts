@@ -58,7 +58,7 @@ console.log({ frontendUrl }, process.env.NODE_ENV);
 
 const io = new Server(expressServer, {
 	cors: {
-		origin: [frontendUrl],
+		origin: "*",
 		allowedHeaders: ["*"],
 		methods: ["GET", "POST"],
 	},
