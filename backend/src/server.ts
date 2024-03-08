@@ -2,10 +2,12 @@ import express, { Request, Response } from "express";
 import fs from "fs";
 import { Server } from "socket.io";
 import https from "https";
+import http from "http";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
-
 app.use(cors());
 
 app.use(function (req, res, next) {
@@ -31,7 +33,7 @@ app.use(function (req, res, next) {
 
 app.use(express.static(__dirname));
 
-const PORT = 4000;
+const PORT = 8181;
 
 //we need a key and cert to run https
 //we generated them with mkcert
@@ -43,13 +45,18 @@ const cert = fs.readFileSync("cert.crt");
 //we changed our express setup so we can use https
 //pass the key and cert to createServer on https
 // const expressServer = https.createServer({ key, cert }, app);
-const expressServer = https.createServer({ key, cert }, app);
+let expressServer: any = https.createServer({ key, cert }, app);
+
+if (process.env.NODE_ENV !== "development") {
+    expressServer = http.createServer(app);
+}
 
 //create our socket.io server... it will listen to our express port
+const frontendUrl = process.env.PRODUCTION_FRONTEND_URL || "https://localhost:5173";
 
 const io = new Server(expressServer, {
 	cors: {
-		origin: ["https://v-conf-app.netlify.app"],
+		origin: [frontendUrl],
 		allowedHeaders: ["*"],
 		methods: ["GET", "POST"],
 	},
@@ -61,16 +68,16 @@ expressServer.listen(PORT, () => {
 });
 
 type Message = {
-    id: number;
-    user: string;
-    text: string;
-}
+	id: number;
+	user: string;
+	text: string;
+};
 type TUsers = {
-    [key in string]: {
-        peerId: string;
-        userId: string
-    }[]
-}
+	[key in string]: {
+		peerId: string;
+		userId: string;
+	}[];
+};
 const users: TUsers = {};
 const messages: Message[] = [];
 const socketToRoom: any = {};
@@ -91,7 +98,6 @@ io.on("connection", (socket) => {
 				peerId,
 				userId: socket.id,
 			});
-            
 		} else {
 			users[roomID] = [
 				{
@@ -103,10 +109,10 @@ io.on("connection", (socket) => {
 
 		socketToRoom[socket.id] = roomID;
 
-        // emit to all existing/online users
+		// emit to all existing/online users
 		socket.broadcast.emit("all users", users[roomID]);
 
-        // emit to self
+		// emit to self
 		socket.emit("all users", users[roomID]);
 
 		console.log({ users });
@@ -125,7 +131,7 @@ io.on("connection", (socket) => {
 		messages.push(newMessage);
 
 		// Broadcast the new message to all connected clients
-        socket.emit("newMessage", newMessage);
+		socket.emit("newMessage", newMessage);
 		socket.broadcast.emit("newMessage", newMessage);
 	});
 
@@ -141,5 +147,11 @@ io.on("connection", (socket) => {
 });
 
 app.get("/", (req: Request, res: Response) => {
-    res.send('Hello from Video Conference Demo App'); 
-})
+	res.send("Hello from Video Conference Demo App");
+});
+
+if (process.env.node_env === "development") {
+	console.log("Node.js is running in development mode");
+} else {
+	console.log("Node.js is not running in development mode");
+}

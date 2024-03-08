@@ -62,7 +62,8 @@ function App() {
     useEffect(() => {
         if (!socketIo) {
             // initialize socket io client
-            const socket = io("https://video-conferencing-app-ysok.onrender.com");
+            const url = import.meta.env.VITE_PRODUCTION_API || "https://localhost:8181"
+            const socket = io(url);
             setSocketIo(socket);
         }
         if (!username) {
