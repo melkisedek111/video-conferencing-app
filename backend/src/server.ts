@@ -139,3 +139,7 @@ io.on("connection", (socket) => {
 		}
 	});
 });
+
+app.get("/", (req: Request, res: Response) => {
+    res.send('Hello from Video Conference Demo App'); 
+})
