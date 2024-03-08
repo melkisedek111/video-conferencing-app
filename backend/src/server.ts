@@ -49,7 +49,7 @@ const expressServer = https.createServer({ key, cert }, app);
 
 const io = new Server(expressServer, {
 	cors: {
-		origin: ["https://localhost:5173"],
+		origin: ["https://v-conf-app.netlify.app"],
 		allowedHeaders: ["*"],
 		methods: ["GET", "POST"],
 	},
@@ -100,7 +100,7 @@ io.on("connection", (socket) => {
 				},
 			];
 		}
-        
+
 		socketToRoom[socket.id] = roomID;
 
         // emit to all existing/online users
