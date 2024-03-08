@@ -139,6 +139,7 @@ function App() {
         navigator.mediaDevices.enumerateDevices().then(dev => {
             const videoDevices = dev.filter(device => device.kind === 'videoinput');
             const newDevices = videoDevices.map(device => ({ label: device.label, value: device.deviceId })).filter(device => device.label !== "");
+            console.log({newDevices})
             setDevices(newDevices);
         });
 
