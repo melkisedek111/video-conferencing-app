@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/server.ts",
     "dev": "nodemon --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "server": "node build/server.js"
   },
   "keywords": [],
   "author": "",
