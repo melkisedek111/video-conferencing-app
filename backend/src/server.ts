@@ -48,11 +48,12 @@ const cert = fs.readFileSync("cert.crt");
 let expressServer: any = https.createServer({ key, cert }, app);
 
 if (process.env.NODE_ENV !== "development") {
-    expressServer = http.createServer(app);
+	expressServer = http.createServer(app);
 }
 
 //create our socket.io server... it will listen to our express port
-const frontendUrl = process.env.PRODUCTION_FRONTEND_URL || "https://localhost:5173";
+const frontendUrl =
+	process.env.PRODUCTION_FRONTEND_URL || "https://localhost:5173";
 
 const io = new Server(expressServer, {
 	cors: {
@@ -81,6 +82,12 @@ type TUsers = {
 const users: TUsers = {};
 const messages: Message[] = [];
 const socketToRoom: any = {};
+
+// Middleware to set CORS headers for Socket.IO
+io.use((socket, next) => {
+	socket.handshake.headers["Access-Control-Allow-Origin"] = "*"; // Allow requests from any origin
+	next();
+});
 
 io.on("connection", (socket) => {
 	socket.on("join room", (payload) => {
